@@ -11,7 +11,6 @@
 #include <time.h>
 
 typedef struct vl53l1x_s vl53l1x_t;
-typedef	uint8_t bool;
 
 typedef enum {
    VL53L1X_Short, VL53L1X_Medium, VL53L1X_Long, VL53L1X_Unknown
@@ -53,10 +52,10 @@ uint32_t vl53l1x_readReg32Bit(vl53l1x_t *, uint16_t reg);
 void vl53l1x_writeMulti(vl53l1x_t *, uint16_t reg, uint8_t const *src, uint8_t count);
 void vl53l1x_readMulti(vl53l1x_t *, uint16_t reg, uint8_t * dst, uint8_t count);
 
-//bool vl53l1x_setDistanceMode(vl53l1x_t *,vl53l1x_DistanceMode mode);
+//uint8_t vl53l1x_setDistanceMode(vl53l1x_t *,vl53l1x_DistanceMode mode);
 vl53l1x_DistanceMode vl53l1x_getDistanceMode(vl53l1x_t *);
 
-//bool vl53l1x_setMeasurementTimingBudget(vl53l1x_t *,uint32_t budget_us);
+//uint8_t vl53l1x_setMeasurementTimingBudget(vl53l1x_t *,uint32_t budget_us);
 uint32_t vl53l1x_getMeasurementTimingBudget(vl53l1x_t *);
 
 void vl53l1x_setROISize(vl53l1x_t *,uint8_t width, uint8_t height);
@@ -66,18 +65,16 @@ uint8_t vl53l1x_getROICenter(vl53l1x_t *);
 
 void vl53l1x_startContinuous(vl53l1x_t *,uint32_t period_ms);
 void vl53l1x_stopContinuous(vl53l1x_t *);
-//uint16_t vl53l1x_read(vl53l1x_t *,bool blocking);
-uint16_t vl53l1x_readRangeContinuousMillimeters(vl53l1x_t *,bool blocking);
+//uint16_t vl53l1x_read(vl53l1x_t *,uint8_t blocking);
 
-//uint16_t vl53l1x_readSingle(vl53l1x_t *,bool blocking );
-uint16_t vl53l1x_readRangeSingleMillimeters(vl53l1x_t *,bool blocking );
+uint16_t vl53l1x_readSingle(vl53l1x_t *,uint8_t blocking );
 
-bool vl53l1x_dataReady(vl53l1x_t *);
+uint8_t vl53l1x_dataReady(vl53l1x_t *);
 
 const char *vl53l1x_rangeStatusToString(vl53l1x_t *,vl53l1x_RangeStatus status);
 
 void vl53l1x_setTimeout(vl53l1x_t *,uint16_t timeout);
 uint16_t vl53l1x_getTimeout(vl53l1x_t *);
-//bool vl53l1x_timeoutOccurred(vl53l1x_t *);
+//uint8_t vl53l1x_timeoutOccurred(vl53l1x_t *);
 
 #endif

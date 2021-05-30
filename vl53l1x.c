@@ -1264,7 +1264,7 @@ static void vl53l1x_updateDSS(vl53l1x_t *);
 static void vl53l1x_readResults(vl53l1x_t *);
 uint8_t vl53l1x_readReg(vl53l1x_t * v, uint16_t reg);
 void vl53l1x_writeReg(vl53l1x_t * v, uint16_t reg, uint8_t val);
-bool vl53l1x_setDistanceMode(vl53l1x_t * v, vl53l1x_DistanceMode mode);
+uint8_t vl53l1x_setDistanceMode(vl53l1x_t * v, vl53l1x_DistanceMode mode);
 
 // Record the current time to check an upcoming timeout against
 static inline void vl53l1x_startTimeout(vl53l1x_t * v)
@@ -1273,14 +1273,14 @@ static inline void vl53l1x_startTimeout(vl53l1x_t * v)
 }
 
 // Check if timeout is enabled (set to nonzero value) and has expired
-static inline bool vl53l1x_checkTimeoutExpired(vl53l1x_t * v)
+static inline uint8_t vl53l1x_checkTimeoutExpired(vl53l1x_t * v)
 {
    return (v->io_timeout > 0) && ((uint16_t) (millis() - v->timeout_start_ms) > v->io_timeout);
 }
 
 uint32_t vl53l1x_timeoutMicrosecondsToMclks(uint32_t timeout_us, uint32_t macro_period_us)
 {
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
+   return (((uint32_t) timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
 }
 
 // Convert sequence step timeout from macro periods to microseconds with given
@@ -1376,7 +1376,7 @@ static inline uint16_t vl53l1xencodeVcselPeriod(uint16_t period_pclks)
 // for one measurement. A longer timing budget allows for more accurate
 // measurements.
 // based on VL53L1_SetMeasurementTimingBudgetMicroSeconds()
-bool vl53l1x_setMeasurementTimingBudget(vl53l1x_t * v, uint32_t budget_us)
+uint8_t vl53l1x_setMeasurementTimingBudget(vl53l1x_t * v, uint32_t budget_us)
 {
    // assumes PresetMode is LOWPOWER_AUTONOMOUS
 
@@ -1435,6 +1435,11 @@ bool vl53l1x_setMeasurementTimingBudget(vl53l1x_t * v, uint32_t budget_us)
    // VL53L1_calc_timeout_register_values() end
 
    return true;
+}
+
+uint8_t vl53l1x_dataReady(vl53l1x_t * v)
+{
+   return (vl53l1x_readReg(v, GPIO__TIO_HV_STATUS) & 0x01) == 0;
 }
 
 static inline float countRateFixedToFloat(uint16_t count_rate_fixed)
@@ -1742,7 +1747,7 @@ const char *vl53l1x_init(vl53l1x_t * v)
 }
 
 // set distance mode to Short, Medium, or Long
-bool vl53l1x_setDistanceMode(vl53l1x_t * v, vl53l1x_DistanceMode mode)
+uint8_t vl53l1x_setDistanceMode(vl53l1x_t * v, vl53l1x_DistanceMode mode)
 {
    // save existing timing budget
    uint32_t budget_us = vl53l1x_getMeasurementTimingBudget(v);
@@ -1968,7 +1973,7 @@ void vl53l1x_stopContinuous(vl53l1x_t * v)
 // be available. If blocking is false, it will try to return data immediately.
 // (readSingle() also calls this function after starting a single-shot range
 // measurement)
-uint16_t vl53l1x_read(vl53l1x_t * v, bool blocking)
+uint16_t vl53l1x_read(vl53l1x_t * v, uint8_t blocking)
 {
    if (blocking)
    {
@@ -2003,7 +2008,7 @@ uint16_t vl53l1x_read(vl53l1x_t * v, bool blocking)
 // Starts a single-shot range measurement. If blocking is true (the default),
 // this function waits for the measurement to finish and returns the reading.
 // Otherwise, it returns 0 immediately.
-uint16_t vl53l1x_readSingle(vl53l1x_t * v, bool blocking)
+uint16_t vl53l1x_readSingle(vl53l1x_t * v, uint8_t blocking)
 {
    vl53l1x_writeReg(v, SYSTEM__INTERRUPT_CLEAR, 0x01);  // sys_interrupt_clear_range
    vl53l1x_writeReg(v, SYSTEM__MODE_START, 0x10);       // mode_range__single_shot
@@ -2065,9 +2070,9 @@ const char *vl53l1x_rangeStatusToString(vl53l1x_t * v, vl53l1x_RangeStatus statu
 
 // Did a timeout occur in one of the read functions since the last call to
 // timeoutOccurred()?
-bool vl53l1x_timeoutOccurred(vl53l1x_t * v)
+uint8_t vl53l1x_timeoutOccurred(vl53l1x_t * v)
 {
-   bool tmp = v->did_timeout;
+   uint8_t tmp = v->did_timeout;
    v->did_timeout = false;
    return tmp;
 }
