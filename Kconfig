@@ -1,0 +1,9 @@
+menu "VL53L1X"
+
+	config VL53L1X_DEBUG
+	bool "Low level debug"
+	default n
+	help
+		Low level debug
+
+endmenu
