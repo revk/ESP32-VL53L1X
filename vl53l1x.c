@@ -1988,6 +1988,8 @@ uint16_t vl53l1x_read(vl53l1x_t * v, uint8_t blocking)
    }
 
    vl53l1x_readResults(v);
+   if (v->err)
+      return 0;
 
    if (!v->calibrated)
    {
