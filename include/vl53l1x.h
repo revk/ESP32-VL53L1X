@@ -1,8 +1,8 @@
-// VL53L0X control
+// VL53L1X control
 // Copyright ©2021 Adrian Kennard, Andrews & Arnold Ltd, and original autors. See LICENCE file for details .GPL 3.0
 
-#ifndef VL53L0X_H
-#define VL53L0X_H
+#ifndef VL53L1X_H
+#define VL53L1X_H
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
