@@ -1637,8 +1637,7 @@ const char *vl53l1x_init(vl53l1x_t * v)
    vl53l1x_writeReg(v, SOFT_RESET, 0x01);
 
    // give it some time to boot; otherwise the sensor NACKs during the vl53l1x_readReg(v)
-   // call below and the Arduino 101 doesn't seem to handle that well
-   sleep(1);
+   usleep(100000);
 
    // VL53L1_poll_for_boot_completion() begin
 
@@ -2080,31 +2079,14 @@ uint8_t vl53l1x_timeoutOccurred(vl53l1x_t * v)
 // read measurement results into buffer
 void vl53l1x_readResults(vl53l1x_t * v)
 {
-   i2c_cmd_handle_t i = Read(v, RESULT__RANGE_STATUS);
-   VL53L1X_LOG(TAG, "R %04X=... %s", RESULT__RANGE_STATUS, esp_err_to_name(v->err));
-   uint8_t r(i2c_ack_type_t a) {
-      uint8_t temp;
-      v->err = i2c_master_read_byte(i, &temp, a);
-      VL53L1X_LOG(TAG, "R %02X %s", temp, esp_err_to_name(v->err));
-      return temp;
-   }
-   v->results.range_status = r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   v->results.stream_count = r(I2C_MASTER_ACK);
-   v->results.dss_actual_effective_spads_sd0 = (r(I2C_MASTER_ACK) << 8);
-   v->results.dss_actual_effective_spads_sd0 |= r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   v->results.ambient_count_rate_mcps_sd0 = (r(I2C_MASTER_ACK) << 8);
-   v->results.ambient_count_rate_mcps_sd0 |= r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   r(I2C_MASTER_ACK);
-   v->results.final_crosstalk_corrected_range_mm_sd0 = (r(I2C_MASTER_ACK) << 8);
-   v->results.final_crosstalk_corrected_range_mm_sd0 |= r(I2C_MASTER_ACK);
-   v->results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 = (r(I2C_MASTER_ACK) << 8);
-   v->results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 |= r(I2C_MASTER_NACK);
-   v->err = Done(v, i);
+   uint8_t b[17];
+   vl53l1x_readMulti(v, RESULT__RANGE_STATUS, b, sizeof(b));
+   v->results.range_status = b[0];
+   v->results.stream_count = b[2];
+   v->results.dss_actual_effective_spads_sd0 = (b[3] << 8) | b[4];
+   v->results.ambient_count_rate_mcps_sd0 = (b[7] << 8) | b[8];
+   v->results.final_crosstalk_corrected_range_mm_sd0 = (b[13] << 8) | b[14];
+   v->results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 = (b[15] << 8) | b[16];
 }
 
 // perform Dynamic SPAD Selection calculation/update
