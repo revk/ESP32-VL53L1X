@@ -10,7 +10,7 @@ static const char __attribute__((unused)) TAG[] = "ranger";
 
 #define TIMEOUT	(10/portTICK_PERIOD_MS) // I2C command timeout
 
-#define VL53L1X_LOG   ESP_LOGI  // Set to allow I2C logginc
+//#define VL53L1X_LOG   ESP_LOGI  // Set to allow I2C logginc
 
 #ifndef VL53L1X_LOG
 #define VL53L1X_LOG(tag,...)
