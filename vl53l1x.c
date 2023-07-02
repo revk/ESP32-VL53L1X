@@ -1511,7 +1511,7 @@ void vl53l1x_writeReg32Bit(vl53l1x_t * v, uint16_t reg, uint32_t val)
    i2c_master_write_byte(i, val >> 8, 1);
    i2c_master_write_byte(i, val, 1);
    v->err = Done(v, i);
-   VL53L1X_LOG(TAG, "W %04X=%08X %s", reg, val, esp_err_to_name(v->err));
+   VL53L1X_LOG(TAG, "W %04X=%08ulX %s", reg, val, esp_err_to_name(v->err));
 }
 
 uint8_t vl53l1x_readReg(vl53l1x_t * v, uint16_t reg)
